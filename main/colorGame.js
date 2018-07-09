@@ -1,47 +1,109 @@
-console.log("connected"); //ensure js file connection to html file
+var numSquares = 6;
+var colors = [];
+var pickedColor;
+var squares = document.querySelectorAll(".square");
+var colorDisplay = document.getElementById("colorDisplay");
+var messageDisplay = document.querySelector("#message");
+var h1 = document.querySelector("h1");
+var resetButton = document.querySelector("#reset");
+var modeButtons = document.querySelectorAll(".mode");
 
-var colors = [ //array of colors assigned to class 'square'
-"rgb(255, 0, 0)",
-"rgb(255, 255, 0)",
-"rgb(0, 255, 0)",
-"rgb(0, 255, 255)",
-"rgb(0, 0, 255)",
-"rgb(255, 0, 255)",
-]
 
-var squares = document.querySelectorAll(".square"); //select squares
-var pickedColor = pickColor(); //the winning color
-var colorDisplay = document.getElementById("colorDisplay"); //the rgb value of the winning color (to be guessed)
-var messageDisplay = document.getElementById("message");
-var body = document.getElementById("container");
+init();
 
-colorDisplay.textContent = pickedColor; //updates the span to become the correct color
+function init () {
+	//mode buttons event listeners
+	setupModeButtons();
+	setupSquares();
+	reset();
+}
 
-for (var i = 0; i < squares.length; i++) { //loop through all square divs
+function setupModeButtons() {
+	for(var i = 0; i < modeButtons.length; i++) {
+		modeButtons[i].addEventListener("click", function(){
+		modeButtons[0].classList.remove("selected");
+		modeButtons[1].classList.remove("selected");
+		this.classList.add("selected");
+		this.textContent === "Easy" ? numSquares = 3: numSquares = 6;
+		reset();
+		});
+	}
+}
 
-	squares[i].style.backgroundColor = colors[i]; //assign colors array index value(color) to square div backgrounds
-	squares[i].addEventListener("click", function (){ //add clicklistener to squares
-		var clickedColor = this.style.backgroundColor; //assign the clicked color to variable 
-
+function setupSquares () {
+	for (var i = 0; i < squares.length; i++) { //loop through all square divs
+		squares[i].addEventListener("click", function (){ //add clicklistener to squares
+		var clickedColor = this.style.background; //assign the clicked color to variable 
 		if(clickedColor === pickedColor){ //check if clicked color value is equal to correct color
-
 			messageDisplay.textContent = "Nice work!";
+			resetButton.textContent = "Play again?"
 			changeColors(clickedColor);
-
+			h1.style.background = clickedColor;
 		} else {
 			this.style.background = "#232323";
 			messageDisplay.textContent = "Try again!";
-		}
-	});
+			}
+		});
+	} 
 }
+
+
+
+
+function reset() {
+	colors = generateRandomColors(numSquares);
+	//pick a new random color from array
+	pickedColor = pickColor();
+	//change picked color span element
+	colorDisplay.textContent = pickedColor;
+	resetButton.textContent = "New Colors";
+	messageDisplay.textContent = "";
+	//change colors of squares
+	for (var i = 0; i < squares.length; i++) {
+		if(colors[i]) {
+		squares[i].style.display = "block";
+		squares[i].style.background = colors[i];
+		} else {
+		squares[i].style.display = "none";
+		}
+		
+	}
+	h1.style.background = "steelblue";
+
+}
+
+resetButton.addEventListener("click", function(){
+	reset();
+})
+
 
 function changeColors(color) {
 	for ( var i = 0; i < squares.length; i++) {
-			squares[i].style.backgroundColor = color;
+			squares[i].style.background = color;
 		}
 }
 
 function pickColor() {
 	var random = Math.floor(Math.random() * colors.length); //generate random number equal to array length
 	return colors[random]; // takes random number and array index and assigns it to pickedColor
+}
+
+function generateRandomColors(num) {
+	var arr = []
+	//add num random colors to array
+	for (i = 0; i < num; i++) {
+		//get random color and push into array
+		arr.push(randomColor())
+	}
+	return arr;
+}
+
+function randomColor(){
+	//pick a red from 0-255
+	var r = Math.floor(Math.random() * 256)
+	//pick a green from 0-255
+	var g = Math.floor(Math.random() * 256)
+	//pick a blue from 0-255
+	var b = Math.floor(Math.random() * 256)
+	return "rgb(" + r + ", " + g + ", " + b + ")";
 }
